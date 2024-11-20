@@ -744,7 +744,7 @@ namespace ChessDotNet
             {
                 throw new InvalidOperationException("Source piece does not exist.");
             }
- 
+
             Piece capturedPiece = GetPieceAt(move.NewPosition.File, move.NewPosition.Rank);
             captured = capturedPiece;
             Piece newPiece = movingPiece;
@@ -1333,5 +1333,156 @@ namespace ChessDotNet
                 Resigned = Resigned
             };
         }
+
+        public override string ToString()
+        {
+            return RenderChessBoard(true);
+        }
+
+        public static string repeatString(string text, int n)
+        {
+            return new StringBuilder(text.Length * n)
+              .Insert(0, text, n)
+              .ToString();
+        }
+
+        public string RenderChessBoard(bool unicode = false, int displayMode = 1)
+        {
+            string fen = GetFen();
+            if (string.IsNullOrWhiteSpace(fen))
+            {
+                throw new ArgumentException("FEN notation cannot be null or empty.", nameof(fen));
+            }
+
+            // Split the FEN string into its components
+            var parts = fen.Split(' ');
+            if (parts.Length < 1)
+            {
+                throw new ArgumentException("Invalid FEN notation.", nameof(fen));
+            }
+
+            // Extract the board layout part of the FEN notation
+            var rows = parts[0].Split('/');
+            if (rows.Length != 8)
+            {
+                throw new ArgumentException("Invalid FEN board layout.", nameof(fen));
+            }
+
+            var builder = new StringBuilder();
+            builder.AppendLine("");
+            builder.AppendLine("");
+            builder.AppendLine("");
+            builder.AppendLine("");
+            builder.AppendLine("");
+            builder.AppendLine("");
+            builder.AppendLine("");
+            builder.AppendLine("");
+            builder.AppendLine("");
+            builder.AppendLine("");
+            builder.AppendLine("");
+            builder.AppendLine("  +-------------------------+");
+            for (int i = 0; i < rows.Length; i++)
+            {
+                builder.Append(8 - i).Append(" | "); // Add row number
+                foreach (char c in rows[i])
+                {
+                    if (char.IsDigit(c))
+                    {
+                        // Empty squares, add dots & spaces
+                        appendEmptySquareForDisplayMode(displayMode, builder, c);
+                    }
+                    else
+                    {
+                        if (unicode)
+                        {
+                            var unicodeCharacter = asciiUnicodeMapping[c.ToString()];
+                            appendPieceForDisplayMode(displayMode, builder, unicodeCharacter);
+                        }
+                        else
+                        {
+                            // Add piece symbols with a space
+                            builder.Append(" ").Append(c).Append(" ");
+                        }
+                    }
+                }
+                builder.AppendLine("|");
+            }
+            builder.AppendLine("  +-------------------------+");
+            builder.AppendLine("     a  b  c  d  e  f  g  h"); // Add column labels
+            builder.AppendLine("");
+            builder.AppendLine($"{WhoseTurn} to move");
+            builder.AppendLine("White: \u2654");
+            builder.AppendLine("Black: \u265A");
+
+            return builder.ToString();
+        }
+
+        private void appendPieceForDisplayMode(int mode, StringBuilder builder, String unicodeCharacter)
+        {
+            switch (mode)
+            {
+                case 2:
+                    builder.Append(" ").Append(unicodeCharacter).Append(" ");
+                    break;
+                case 3:
+                    builder.Append(" ").Append(unicodeCharacter).Append(" ");
+                    break;
+                case 4:
+                    builder.Append(unicodeCharacter);
+                    break;
+                case 5:
+                    builder.Append(unicodeCharacter);
+                    break;
+                case 6:
+                    builder.Append(unicodeCharacter);
+                    break;
+                default:
+                    builder.Append(" ").Append(unicodeCharacter);
+                    break;
+            }
+        }
+
+        private void appendEmptySquareForDisplayMode(int mode, StringBuilder builder, char c)
+        {
+            switch (mode)
+            {
+                case 2:
+                    builder.Append(repeatString(" . ", int.Parse(c.ToString())));
+                    break;
+                case 3:
+                    builder.Append(repeatString(" .", int.Parse(c.ToString())));
+                    break;
+                case 4:
+                    builder.Append(repeatString(".", int.Parse(c.ToString())));
+                    break;
+                case 5:
+                    builder.Append(repeatString(" .", int.Parse(c.ToString())));
+                    break;
+                case 6:
+                    builder.Append(repeatString(" . ", int.Parse(c.ToString())));
+                    break;
+                default:
+                    builder.Append(repeatString(" . ", int.Parse(c.ToString())));
+                    break;
+            }
+        }
+
+        private Dictionary<string, string> asciiUnicodeMapping = new Dictionary<string, string> {
+    { "K", "\u2654" },
+    { "Q", "\u2655" },
+    { "R", "\u2656" },
+    { "B", "\u2657" },
+    { "N", "\u2658" },
+    { "P", "\u2659" },
+    { "k", "\u265A" },
+    { "q", "\u265B" },
+    { "r", "\u265C" },
+    { "b", "\u265D" },
+    { "n", "\u265E" },
+    { "p", "\u265F" }
+};
+
     }
+
+
 }
