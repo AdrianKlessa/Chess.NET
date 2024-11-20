@@ -1,3 +1,9 @@
+Fork of Chess.NET with added board display in ASCII / Unicode mode. 
+
+Used for a mod for a game that uses an older version of Unity, so Chess projects that utilize newer .NET functionality were not compatible.
+
+---
+
 [![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
 
 I don't intend to continue maintaining this project. See https://github.com/thomas-daniels/Chess.NET/issues/29#issuecomment-599210147 for the details.
